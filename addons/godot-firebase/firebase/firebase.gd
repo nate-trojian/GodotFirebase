@@ -12,6 +12,7 @@ tool
 extends Node
 
 const _ENVIRONMENT_VARIABLES : String = "firebase/environment_variables/"
+const _EMULATOR_VARIABLES : String = "firebase/environment_variables/emulator"
 
 ## @type FirebaseAuth
 ## The Firebase Authentication API.
@@ -48,7 +49,14 @@ var _config : Dictionary = {
     "clientId": "",
     "clientSecret": "",
     "domainUriPrefix": "",
-    "cacheLocation": "user://.firebase_cache"
+    "cacheLocation": "user://.firebase_cache",
+    "useEmulator": false,
+}
+
+var _emulator_config : Dictionary = {
+        "authURL": "",
+        "databaseURL": "",
+        "firestoreURL": "",
 }
 
 func _ready() -> void:
@@ -71,9 +79,20 @@ func _load_config() -> void:
             else:
                 if _config[key] == "":
                     _printerr("Configuration key '{key}' not found!".format({key = key}))
+        # Load the Emulator config
+        if _config["useEmulator"]:
+            print("Using Emulator Config")
+            _load_emulator_config()
     else:
         _printerr("No configuration settings found, add them in override.cfg file.")
     print("")
+
+func _load_emulator_config() -> void:
+    for key in _emulator_config.keys():
+        var env_var : String = _EMULATOR_VARIABLES + key
+        if ProjectSettings.has_setting(env_var) and ProjectSettings.get_setting(env_var) != "":
+            _emulator_config[key] = ProjectSettings.get_setting(env_var)
+            _config["emulator"] = _emulator_config
 
 func _printerr(error : String) -> void:
     print("[Firebase Error] >> "+error)

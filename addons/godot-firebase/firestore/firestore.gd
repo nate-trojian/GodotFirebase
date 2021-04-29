@@ -65,7 +65,8 @@ var _config : Dictionary = {}
 var _cache_loc: String
 var _encrypt_key := "5vg76n90345f7w390346" if OS.get_name() in ["HTML5", "UWP"] else OS.get_unique_id()
 
-var _base_url : String = "https://firestore.googleapis.com/v1/"
+var _default_url : String = "https://firestore.googleapis.com/v1/"
+var _base_url : String
 var _extended_url : String = "projects/[PROJECT_ID]/databases/(default)/documents/"
 var _query_suffix : String = ":runQuery"
 
@@ -286,6 +287,9 @@ func _set_config(config_json : Dictionary) -> void:
     _config = config_json
     _cache_loc = _config["cacheLocation"]
     _extended_url = _extended_url.replace("[PROJECT_ID]", _config.projectId)
+    _base_url = _default_url
+    if _config.has("emulator"):
+        _base_url = _config["emulator"].get("firebaseURL", _default_url)
     
     var file := File.new()
     if file.file_exists(_cache_loc.plus_file(_CACHE_RECORD_FILE)):

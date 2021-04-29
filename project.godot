@@ -191,6 +191,11 @@ environment_variables/googleClientSecret=""
 environment_variables/clientId=""
 environment_variables/clientSecret=""
 environment_variables/domainUriPrefix=""
+environment_variables/cacheLocation="user://.firebase_cache"
+environment_variables/emulator/authUrl=""
+environment_variables/emulator/databaseUrl=""
+environment_variables/emulator/firestoreUrl=""
+environment_variables/useEmulator=false
 
 [rendering]
 

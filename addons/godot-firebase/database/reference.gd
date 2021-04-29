@@ -24,6 +24,7 @@ var _listener : Node
 var _store : FirebaseDatabaseStore
 var _auth : Dictionary
 var _config : Dictionary
+var _database_url: String
 var _filter_query : Dictionary
 var _db_path : String
 var _cached_filter : String
@@ -53,6 +54,9 @@ func set_db_path(path : String, filter_query_dict : Dictionary) -> void:
 func set_auth_and_config(auth_ref : Dictionary, config_ref : Dictionary) -> void:
     _auth = auth_ref
     _config = config_ref
+    _database_url = _config.databaseURL
+    if _config.has("emulator"):
+        _database_url = _config.emulator.databaseURL
 
 func set_pusher(pusher_ref : HTTPRequest) -> void:
     if !_pusher:
@@ -127,7 +131,7 @@ func _get_remaining_path(is_push : bool = true) -> String:
         return _json_list_tag + _query_tag + _get_filter() + _filter_tag + _auth_tag + Firebase.Auth.auth.idtoken
 
 func _get_list_url() -> String:
-    return _config.databaseURL + _separator # + ListName + _json_list_tag + _auth_tag + _auth.idtoken
+    return _database_url + _separator # + ListName + _json_list_tag + _auth_tag + _auth.idtoken
 
 func _get_filter():
     if !_filter_query:
