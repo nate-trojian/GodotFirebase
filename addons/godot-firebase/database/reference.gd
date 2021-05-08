@@ -55,8 +55,14 @@ func set_auth_and_config(auth_ref : Dictionary, config_ref : Dictionary) -> void
     _auth = auth_ref
     _config = config_ref
     _database_url = _config.databaseURL
+    _namespace_path = ""
     if _config.has("emulator"):
         _database_url = _config.emulator.databaseURL
+        _namespace_path = _filter_tag + _namespace_tag + _config.projectId
+    var _last_colon = _database_url.find_last(":")
+    if _last_colon > "https:".length():
+        _database_port = int(_database_url.right(_last_colon))
+        _database_url = _database_url.left(_last_colon)
 
 func set_pusher(pusher_ref : HTTPRequest) -> void:
     if !_pusher:
@@ -71,7 +77,7 @@ func set_listener(listener_ref : Node) -> void:
         _listener.connect("new_sse_event", self, "on_new_sse_event")
         var base_url = _get_list_url().trim_suffix(_separator)
         var extended_url = _separator + _db_path + _get_remaining_path(false)
-        _listener.connect_to_host(base_url, extended_url)
+        _listener.connect_to_host(base_url, extended_url, _database_port)
 
 func on_new_sse_event(headers : Dictionary, event : String, data : Dictionary) -> void:
     if data:
@@ -126,9 +132,9 @@ func get_data() -> Dictionary:
 
 func _get_remaining_path(is_push : bool = true) -> String:
     if !_filter_query or is_push:
-        return _json_list_tag + _query_tag + _auth_tag + Firebase.Auth.auth.idtoken
+        return _json_list_tag + _query_tag + _auth_tag + Firebase.Auth.auth.idtoken + _namespace_path
     else:
-        return _json_list_tag + _query_tag + _get_filter() + _filter_tag + _auth_tag + Firebase.Auth.auth.idtoken
+        return _json_list_tag + _query_tag + _get_filter() + _filter_tag + _auth_tag + Firebase.Auth.auth.idtoken + _namespace_path
 
 func _get_list_url() -> String:
     return _database_url + _separator # + ListName + _json_list_tag + _auth_tag + _auth.idtoken

@@ -92,7 +92,9 @@ func _load_emulator_config() -> void:
         var env_var : String = _EMULATOR_VARIABLES + key
         if ProjectSettings.has_setting(env_var) and ProjectSettings.get_setting(env_var) != "":
             _emulator_config[key] = ProjectSettings.get_setting(env_var)
-            _config["emulator"] = _emulator_config
+        else:
+            _printerr("Configuration key '{key}' not found!".format({key = key}))
+    _config["emulator"] = _emulator_config
 
 func _printerr(error : String) -> void:
     print("[Firebase Error] >> "+error)
